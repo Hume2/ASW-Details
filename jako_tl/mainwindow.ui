@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>448</width>
-    <height>318</height>
+    <width>935</width>
+    <height>371</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -151,13 +151,109 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="gridLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>0</y>
+      <width>431</width>
+      <height>301</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QTableWidget" name="t_vstup">
+       <property name="showGrid">
+        <bool>true</bool>
+       </property>
+       <property name="rowCount">
+        <number>1</number>
+       </property>
+       <property name="columnCount">
+        <number>3</number>
+       </property>
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>53</number>
+       </attribute>
+       <row/>
+       <column>
+        <property name="text">
+         <string>f[MHz]</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>R [Ω]</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>X [Ω]</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QTableWidget" name="t_vystup">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="showGrid">
+        <bool>true</bool>
+       </property>
+       <property name="rowCount">
+        <number>1</number>
+       </property>
+       <property name="columnCount">
+        <number>3</number>
+       </property>
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>53</number>
+       </attribute>
+       <row/>
+       <column>
+        <property name="text">
+         <string>R [Ω]</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>X [Ω]</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>ČSV</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Přidat řádek</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="text">
+        <string>Vypočítat</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>448</width>
+     <width>935</width>
      <height>25</height>
     </rect>
    </property>

@@ -36,6 +36,20 @@ float spocitej_swr(float r, float x, float ref, bool& inf) {
   }
 }
 
+void spocitej_transformaci(float& Vr, float& Vi, float vlna, float l, float Z0, float Zlr, float Zli) {
+  float t = tan(2 * M_PI * l / vlna);
+  float t2 = t * t;
+  float Zlr2 = Zlr * Zlr;
+  float Zli2 = Zli * Zli;
+  float Z02 = Z0 * Z0;
+  float D = Z0 - Zli * t;
+  D = D * D + Zlr * Zlr * t2;
+  Vr = Z0 * Zlr * (1 + t2);
+  Vi = -t * (Zlr2 + Zli2 - Z02) + Z0 * Zli * (1 - t);
+  Vr = Z0 * Vr / D;
+  Vi = Z0 * Vi / D;
+}
+
 void MainWindow::on_pushButton_clicked()
 {
   //Počítej!!!!
@@ -49,20 +63,12 @@ void MainWindow::on_pushButton_clicked()
   if (!h0 || !h1 || !h2 || !h3 || !h4 || !h5 || zkr == 0) {
     return;
   }
+
+  // Spočítej transformaci
   l /= zkr;
   float vlna = RYCHLOST_SVETLA / f;
-  float t = tan(2 * M_PI * l / vlna);
-  float t2 = t * t;
-  float Zlr2 = Zlr * Zlr;
-  float Zli2 = Zli * Zli;
-  float Z02 = Z0 * Z0;
-  float D = Z0 - Zli * t;
-  D = D * D + Zlr * Zlr * t2;
-  float Vr = Z0 * Zlr * (1 + t2);
-  float Vi = -t * (Zlr2 + Zli2 - Z02) + Z0 * Zli * (1 - t);
-  Vr = Z0 * Vr / D;
-  Vi = Z0 * Vi / D;
-
+  float Vr, Vi;
+  spocitej_transformaci(Vr, Vi, vlna, l, Z0, Zlr, Zli);
   QString str_Vr, str_Vi, str;
   str_Vr.setNum(Vr);
   str_Vi.setNum(Vi);
@@ -104,4 +110,55 @@ void MainWindow::on_pushButton_clicked()
     str = str_Vi + "λ (" + str + "λ - " + str_Vr + "m)";
   }
   ui->l_vlna->setText(str);
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+  //Přidej řádek
+  ui->t_vstup->insertRow(ui->t_vstup->rowCount());
+  ui->t_vystup->insertRow(ui->t_vystup->rowCount());
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+  //Vypočítat dávku!
+  bool h0, h1, h2;
+  float Z0 = ui->E_Z0->text().toFloat(&h0);
+  float l = ui->E_l->text().toFloat(&h1);
+  float zkr = ui->E_zkr->text().toFloat(&h2);
+  if (!h0 || !h1 || !h2 || zkr == 0) {
+    return;
+  }
+  for (int i = 0; i < ui->t_vstup->rowCount(); i++) {
+    QAbstractItemModel* model = ui->t_vstup->model();
+    QModelIndex idx = model->index(i, 0);
+    float f = model->data(idx).toFloat(&h0);
+    idx = model->index(i, 1);
+    float Zlr = model->data(idx).toFloat(&h1);
+    idx = model->index(i, 2);
+    float Zli = model->data(idx).toFloat(&h2);
+    if (!h0 || !h1 || !h2) {
+      ui->t_vstup->removeRow(i);
+      ui->t_vystup->removeRow(i);
+      i--;
+      continue;
+    }
+
+    l /= zkr;
+    float vlna = RYCHLOST_SVETLA / f, Vr, Vi;
+    spocitej_transformaci(Vr, Vi, vlna, l, Z0, Zlr, Zli);
+    float swr = spocitej_swr(Vr, Vi, 50, h0);
+
+    QString str;
+    str.setNum(Vr, '.', 2);
+    ui->t_vystup->setItem(i, 0, new QTableWidgetItem(str));
+    str.setNum(Vi, '.', 2);
+    ui->t_vystup->setItem(i, 1, new QTableWidgetItem(str));
+    if (h0 || swr > 10000) {
+      str = "∞";
+    } else {
+      str.setNum(swr, '.', 2);
+    }
+    ui->t_vystup->setItem(i, 2, new QTableWidgetItem(str));
+  }
 }
