@@ -13,8 +13,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    bazmek.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    bazmek.h
 
 FORMS    += mainwindow.ui

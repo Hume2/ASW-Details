@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
+  on_pushButton_clicked();
 }
 
 MainWindow::~MainWindow()
