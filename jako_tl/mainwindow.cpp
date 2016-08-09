@@ -46,7 +46,6 @@ void MainWindow::on_pushButton_clicked()
   float f = ui->E_f->text().toFloat(&h4);
   float zkr = ui->E_zkr->text().toFloat(&h5);
   if (!h0 || !h1 || !h2 || !h3 || !h4 || !h5 || zkr == 0) {
-    ui->l_vysledek->setText("???");
     return;
   }
   l /= zkr;
@@ -72,11 +71,36 @@ void MainWindow::on_pushButton_clicked()
     str = str_Vr + str_Vi + "j";
   }
   ui->l_vysledek->setText(str);
+
+  // Spočítej SWR
   float swr = spocitej_swr(Vr, Vi, 50, h0);
   if (h0 || swr > 1000) {
-    ui->l_swr->setText("∞");
+    ui->l_swr->setText("ČSV: ∞");
   } else {
     str.setNum(swr);
+    str = "ČSV: " + str;
     ui->l_swr->setText(str);
   }
+
+  // Spočítej délku ve vlnách
+  float l_zb = fmod(l * 4, vlna) / 4;
+  float l_cl = l/vlna;
+  float l_4cl = int(l_cl * 4);
+  if (l_zb > vlna / 8) {
+    l_zb = l_zb - vlna / 4;
+    l_4cl++;
+  } else if (l_zb < -vlna / 8) {
+    l_zb = l_zb + vlna / 4;
+    l_4cl--;
+  }
+  str_Vi.setNum(l_cl, '.', 2);
+  str.setNum(l_4cl / 4);
+  if (l_zb >= 0) {
+    str_Vr.setNum(l_zb, '.', 2);
+    str = str_Vi + "λ (" + str + "λ + " + str_Vr + "m)";
+  } else {
+    str_Vr.setNum(-l_zb, '.', 2);
+    str = str_Vi + "λ (" + str + "λ - " + str_Vr + "m)";
+  }
+  ui->l_vlna->setText(str);
 }
