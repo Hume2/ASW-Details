@@ -16,9 +16,15 @@ class Bazmek
 
     enum Zapojeni{SERIOVE, PARALELNI};
     Zapojeni zapojeni;
+    Zapojeni umisteni;
 
     float impedance(float f);
     int slozitost();
+    float proveditelnost();
+
+    void odstran_prebytecne();
+
+    Bazmek(float hodnota_, Druh druh_, Zapojeni umisteni_);
 };
 
 #endif // BAZMEK_H

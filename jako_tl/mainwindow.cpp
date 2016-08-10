@@ -3,6 +3,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "bazmekarium.h"
+
 const float RYCHLOST_SVETLA = 299.792458;
 
 MainWindow::MainWindow(QWidget *parent) :

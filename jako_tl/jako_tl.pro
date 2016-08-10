@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    bazmek.cpp
+    bazmek.cpp \
+    bazmekarium.cpp
 
 HEADERS  += mainwindow.h \
-    bazmek.h
+    bazmek.h \
+    bazmekarium.h
 
 FORMS    += mainwindow.ui
