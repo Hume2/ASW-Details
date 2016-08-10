@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>935</width>
+    <width>1216</width>
     <height>371</height>
    </rect>
   </property>
@@ -156,7 +156,7 @@
      <rect>
       <x>420</x>
       <y>0</y>
-      <width>431</width>
+      <width>621</width>
       <height>301</height>
      </rect>
     </property>
@@ -245,6 +245,51 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="2">
+      <widget class="QTableWidget" name="t_vystup_2">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="showGrid">
+        <bool>true</bool>
+       </property>
+       <property name="rowCount">
+        <number>1</number>
+       </property>
+       <property name="columnCount">
+        <number>3</number>
+       </property>
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>53</number>
+       </attribute>
+       <row/>
+       <column>
+        <property name="text">
+         <string>R [Ω]</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>X [Ω]</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>ČSV</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="text">
+        <string>Přizpůsobit</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -253,7 +298,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>935</width>
+     <width>1216</width>
      <height>25</height>
     </rect>
    </property>

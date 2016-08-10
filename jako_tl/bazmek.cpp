@@ -5,6 +5,7 @@
 #include "bazmek.h"
 
 const float PI_KOEF = M_PI / 500000;
+const char koncovky[13] = {'p', 'n', 'u', 'm', ' ', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'};
 
 Bazmek::Bazmek() :
   b(),
@@ -13,6 +14,10 @@ Bazmek::Bazmek() :
   zapojeni(),
   umisteni()
 {
+
+}
+
+void Bazmek::nahodne() {
   if (rand() % 2) {
     druh = CIVKA;
     hodnota = (rand() % 200 + 1) * (rand() % 200 + 1);
@@ -24,6 +29,16 @@ Bazmek::Bazmek() :
   zapojeni = (Zapojeni)(rand() % 2);
   umisteni = (Zapojeni)(rand() % 2);
   b.clear();
+
+  if (rand() % 6 > 4) {
+    Bazmek bz(hodnota, druh, umisteni);
+    bz.zapojeni = zapojeni;
+    b.push_back(bz);
+    while (rand() % 3) {
+      bz.nahodne();
+      b.push_back(bz);
+    }
+  }
 }
 
 Bazmek::Bazmek(float hodnota_, Druh druh_, Zapojeni umisteni_) :
@@ -111,4 +126,41 @@ void Bazmek::odstran_prebytecne() {
   for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
     bz->odstran_prebytecne();
   }
+}
+
+QString Bazmek::to_string() {
+  QString result = "";
+  if (b.size()) {
+    switch (zapojeni) {
+      case SERIOVE:
+        result = "sériově(";
+        break;
+      case PARALELNI:
+        result = "paralelně(";
+        break;
+    }
+    for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+      result += bz->to_string() + ", ";
+    }
+    result.remove(result.size() - 2, 2);
+    result += ")";
+  } else {
+    int koncovka = 0;
+    float h = hodnota;
+    while (h > 1000 && koncovka < 12) {
+      h /= 1000;
+      koncovka++;
+    }
+    result.setNum(h);
+    result += koncovky[koncovka];
+    switch (druh) {
+      case CIVKA:
+        result += "H";
+        break;
+      case KONDENZATOR:
+        result += "F";
+        break;
+    }
+  }
+  return result;
 }

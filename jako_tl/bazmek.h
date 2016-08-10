@@ -2,6 +2,7 @@
 #define BAZMEK_H
 
 #include <vector>
+#include <qstring.h>
 
 class Bazmek
 {
@@ -23,6 +24,10 @@ class Bazmek
     float proveditelnost();
 
     void odstran_prebytecne();
+
+    void nahodne();
+
+    QString to_string();
 
     Bazmek(float hodnota_, Druh druh_, Zapojeni umisteni_);
 };

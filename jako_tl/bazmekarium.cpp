@@ -1,13 +1,25 @@
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "bazmekarium.h"
 
-std::vector<float> Bazmekarium::kmitocty(7, 1);
+std::vector<Bazmekarium::Zadani> Bazmekarium::zadani;
 int Bazmekarium::max_slozitost = 6;
 
 Bazmekarium::Bazmekarium() :
   bazmeky()
 {
+}
+
+void Bazmekarium::nahodne() {
+  Bazmek b;
+  b.nahodne();
+  bazmeky.push_back(b);
+  while (rand() % 3) {
+    b.nahodne();
+    bazmeky.push_back(b);
+  }
 }
 
 int Bazmekarium::spocitej_slozitost() {
@@ -58,18 +70,18 @@ float Bazmekarium::spocitej_swr(float Zlr, float Zli, float f) {
   }
 }
 
-float Bazmekarium::spocitej_uzitecnost(float Zlr, float Zli) {
+float Bazmekarium::spocitej_uzitecnost() {
   float result = 1;
-  for (std::vector<float>::iterator f = kmitocty.begin(); f != kmitocty.end() ; ++f) {
-    float swr = spocitej_swr(Zlr, Zli, *f);
+  for (std::vector<Zadani>::iterator z = zadani.begin(); z != zadani.end() ; ++z) {
+    float swr = spocitej_swr(z->Zlr, z->Zli, z->f);
     result *= (swr > 10) ? 10 : swr;
   }
   return result;
 }
 
-float Bazmekarium::ohodnot(float Zlr, float Zli) {
+float Bazmekarium::ohodnot() {
   float result = 1;
-  result *= spocitej_uzitecnost(Zlr, Zli);
+  result *= spocitej_uzitecnost();
   result *= spocitej_slozitost();
   result *= spocitej_proveditelnost();
   return result;
@@ -79,4 +91,16 @@ void Bazmekarium::odstran_zbytecne() {
   for (std::vector<Bazmek>::iterator bz = bazmeky.begin(); bz != bazmeky.end() ; ++bz) {
     bz->odstran_prebytecne();
   }
+}
+
+QString Bazmekarium::to_string() {
+  QString result = "ant < ";
+  for (std::vector<Bazmek>::iterator bz = bazmeky.begin(); bz != bazmeky.end() ; ++bz) {
+    if (bz->umisteni == Bazmek::PARALELNI) {
+      result += "napříč ";
+    }
+    result += bz->to_string();
+    result += " < ";
+  }
+  return result;
 }

@@ -1,9 +1,12 @@
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "bazmekarium.h"
+#include "darwin.h"
 
 const float RYCHLOST_SVETLA = 299.792458;
 
@@ -13,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
   ui->setupUi(this);
   on_pushButton_clicked();
+  srand(time(NULL));
 }
 
 MainWindow::~MainWindow()
@@ -119,6 +123,7 @@ void MainWindow::on_pushButton_2_clicked()
   //Přidej řádek
   ui->t_vstup->insertRow(ui->t_vstup->rowCount());
   ui->t_vystup->insertRow(ui->t_vystup->rowCount());
+  ui->t_vystup_2->insertRow(ui->t_vystup_2->rowCount());
 }
 
 void MainWindow::on_pushButton_3_clicked()
@@ -142,6 +147,7 @@ void MainWindow::on_pushButton_3_clicked()
     if (!h0 || !h1 || !h2) {
       ui->t_vstup->removeRow(i);
       ui->t_vystup->removeRow(i);
+      ui->t_vystup_2->removeRow(i);
       i--;
       continue;
     }
@@ -163,4 +169,12 @@ void MainWindow::on_pushButton_3_clicked()
     }
     ui->t_vystup->setItem(i, 2, new QTableWidgetItem(str));
   }
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+  //Přizpůsob!
+  Darwin d;
+  d.pridej_tvory(10);
+  d.vypis_populaci();
 }

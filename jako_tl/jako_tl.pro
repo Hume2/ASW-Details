@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     bazmek.cpp \
-    bazmekarium.cpp
+    bazmekarium.cpp \
+    darwin.cpp
 
 HEADERS  += mainwindow.h \
     bazmek.h \
-    bazmekarium.h
+    bazmekarium.h \
+    darwin.h
 
 FORMS    += mainwindow.ui
