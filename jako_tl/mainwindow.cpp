@@ -2,11 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <cmath>
+
+#include <iostream>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "darwin.h"
+#include "darwin2.h"
 
 const float RYCHLOST_SVETLA = 299.792458;
 
@@ -174,7 +177,60 @@ void MainWindow::on_pushButton_3_clicked()
 void MainWindow::on_pushButton_4_clicked()
 {
   //Přizpůsob!
-  Darwin d;
+  bool h0, h1, h2;
+  Darwin2::zadani.clear();
+  for (int i = 0; i < ui->t_vystup->rowCount(); i++) {
+    QAbstractItemModel* model = ui->t_vstup->model();
+    QAbstractItemModel* model_ = ui->t_vystup->model();
+    QModelIndex idx = model->index(i, 0);
+    float f = model->data(idx).toFloat(&h0);
+    idx = model_->index(i, 0);
+    float Zlr = model_->data(idx).toFloat(&h1);
+    idx = model_->index(i, 1);
+    float Zli = model_->data(idx).toFloat(&h2);
+    if (!h0 || !h1 || !h2) {
+      break;
+    }
+    Darwin2::zadani.push_back(Darwin2::Zadani(Zlr, Zli, f));
+  }
+
+  Darwin2 d;
   d.pridej_tvory(10);
+  d.ohodnot();
+  d.serad();
   d.vypis_populaci();
+  for (d.generace = 1; d.generace <= 100; d.generace++) {
+    d.mutace();
+    d.krizeni();
+    d.rozmnozuj();
+    d.ohodnot();
+    d.serad();
+  }
+  d.vypis_populaci();
+
+  Darwin2::Bazmek& nej = d.populace[0];
+  //nej.odstran_zbytecne();
+
+  for (int i = 0; i < int(Darwin2::zadani.size()); i++) {
+    float Zlr2 = Darwin2::zadani[i].Zlr, Zli2 = Darwin2::zadani[i].Zli, f2 = Darwin2::zadani[i].f;
+    nej.transformuj(Zlr2, Zli2, f2);
+    float swr = Darwin2::spocitej_swr(Zlr2, Zli2, 50);
+
+    QString str;
+    str.setNum(Zlr2, '.', 2);
+    ui->t_vystup_2->setItem(i, 0, new QTableWidgetItem(str));
+    str.setNum(Zli2, '.', 2);
+    ui->t_vystup_2->setItem(i, 1, new QTableWidgetItem(str));
+    if (swr!=swr || swr >= 256 || swr < 0) {
+      str = "∞";
+    } else {
+      str.setNum(swr, '.', 2);
+    }
+    ui->t_vystup_2->setItem(i, 2, new QTableWidgetItem(str));
+  }
+  QString the_str;
+  std::string clovek = nej.lidsky();
+  the_str.fromStdString(clovek);
+  ui->t_prizpusobeni->setText(the_str);
+  std::cout << "\n\n" << clovek << std::endl;
 }

@@ -15,10 +15,18 @@ class Darwin
 
     int generace;
     int max_vyber;
+    int mutacni_index;
 
     void pridej_tvory(int pocet);
+    void mutace();
+    void krizeni();
+    void rozmnozuj();
+    void serad();
+    void ohodnot();
 
     void vypis_populaci();
+
+    static bool je_lepsi(const Bazmekarium& A, const Bazmekarium& B);
 };
 
 #endif // DARWIN_H

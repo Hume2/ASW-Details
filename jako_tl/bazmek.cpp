@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 #include "bazmek.h"
 
@@ -20,10 +21,10 @@ Bazmek::Bazmek() :
 void Bazmek::nahodne() {
   if (rand() % 2) {
     druh = CIVKA;
-    hodnota = (rand() % 200 + 1) * (rand() % 200 + 1);
+    hodnota = float(rand() % 200 + 1) * float(rand() % 200 + 1) * 1000;
   } else {
     druh = KONDENZATOR;
-    hodnota = (rand() % 20 + 1) * (rand() % 20 + 1);
+    hodnota = float(rand() % 200 + 1) * float(rand() % 200 + 1) / 1000;
   }
 
   zapojeni = (Zapojeni)(rand() % 2);
@@ -58,13 +59,13 @@ float Bazmek::impedance(float f) {
     float result = 0;
     switch (zapojeni) {
       case SERIOVE: {
-        for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+        for (std::list<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
           result += bz->impedance(f);
         }
       } return result;
       case PARALELNI: {
         bool prd = true;
-        for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+        for (std::list<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
           if (prd) {
             prd = false;
             result = bz->impedance(f);
@@ -89,7 +90,7 @@ float Bazmek::impedance(float f) {
 int Bazmek::slozitost() {
   if (b.size()) {
     int result = 0;
-    for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+    for (std::list<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
       result += bz->slozitost();
     }
     return result;
@@ -101,29 +102,49 @@ int Bazmek::slozitost() {
 float Bazmek::proveditelnost() {
   if (b.size()) {
     float result = 1;
-    for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+    for (std::list<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
       result *= bz->proveditelnost();
     }
     return result;
   } else {
+    float p;
     switch (druh) {
       case CIVKA:
-        return (1 + 0.00000001 * hodnota * hodnota) / (hodnota * 0.0002);
+        switch (umisteni) {
+          case PARALELNI:
+            p = (1 + 0.0000000001 * hodnota * hodnota) / (hodnota * 0.00002);
+            break;
+          case SERIOVE:
+            p = (1 + 0.00000001 * hodnota * hodnota) / (hodnota * 0.0002);
+            break;
+          default: p = 1;
+        }
+        break;
       case KONDENZATOR:
-        return (1 + 0.0001 * hodnota * hodnota) / (hodnota * 0.02);
-      default: return 1;
+        switch (umisteni) {
+          case PARALELNI:
+            p = (1 + 0.0001 * hodnota * hodnota) / (hodnota * 0.02);
+            break;
+          case SERIOVE:
+            p = (1 + 0.000001 * hodnota * hodnota) / (hodnota * 0.002);
+            break;
+          default: p = 1;
+        }
+        break;
+      default: p = 1;
     }
+    return (p < 3) ? 1 : p * p * p;
   }
 }
 
 void Bazmek::odstran_prebytecne() {
   if (b.size() == 1) {
-    hodnota = b[0].hodnota;
-    zapojeni = b[0].zapojeni;
-    druh = b[0].druh;
+    hodnota = b.begin()->hodnota;
+    zapojeni = b.begin()->zapojeni;
+    druh = b.begin()->druh;
   }
 
-  for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+  for (std::list<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
     bz->odstran_prebytecne();
   }
 }
@@ -139,7 +160,7 @@ QString Bazmek::to_string() {
         result = "paralelně(";
         break;
     }
-    for (std::vector<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+    for (std::list<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
       result += bz->to_string() + ", ";
     }
     result.remove(result.size() - 2, 2);
@@ -163,4 +184,68 @@ QString Bazmek::to_string() {
     }
   }
   return result;
+}
+
+void Bazmek::mutace(float m) {
+  if (int(m) == 0 || rand() % int(m) == 0) {
+    return;
+  }
+
+  switch (rand() % 4) {
+    case 0:
+      if (zapojeni == SERIOVE) {
+        zapojeni = PARALELNI;
+      } else {
+        zapojeni = SERIOVE;
+      }
+      break;
+    case 1:
+      if (umisteni == SERIOVE && druh == KONDENZATOR) {
+        umisteni = PARALELNI;
+      } else if (umisteni == PARALELNI && druh == CIVKA) {
+        umisteni = SERIOVE;
+      }
+      break;
+    case 2:
+      if (b.size()) {
+        for (std::list<Bazmek>::iterator bz = b.begin(); bz != b.end() ; ++bz) {
+          int r = rand() % 100;
+          if (r < m) {
+            m -= r;
+            if (rand() % 7) {
+              bz->mutace(r);
+            } else {
+              if (rand() % 2) {
+                std::list<Bazmek>::iterator bz2 = bz;
+                bz++;
+                b.erase(bz2);
+                bz--;
+              } else {
+                Bazmek bz;
+                bz.nahodne();
+                b.push_back(bz);
+              }
+            }
+          }
+        }
+/*        if (b.size() == 1) {
+          odstran_prebytecne();
+        }*/
+      } else {
+        if (umisteni == SERIOVE && druh == KONDENZATOR) {
+          druh = CIVKA;
+          hodnota = 100 / (hodnota + 1);
+        } else if (umisteni == PARALELNI && druh == CIVKA) {
+          druh = KONDENZATOR;
+          hodnota = 1000000 / (hodnota + 1);
+        }
+      }
+      break;
+    case 3:
+      hodnota *= float(rand() % 100 + 1) / 10;
+      if (hodnota < 1) {
+        hodnota += 1;
+      }
+      break;
+  }
 }

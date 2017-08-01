@@ -16,11 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     bazmek.cpp \
     bazmekarium.cpp \
-    darwin.cpp
+    darwin.cpp \
+    darwin2.cpp
 
 HEADERS  += mainwindow.h \
     bazmek.h \
     bazmekarium.h \
-    darwin.h
+    darwin.h \
+    darwin2.h
 
 FORMS    += mainwindow.ui
+
+CONFIG += c++14

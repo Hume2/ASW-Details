@@ -1,7 +1,7 @@
 #ifndef BAZMEK_H
 #define BAZMEK_H
 
-#include <vector>
+#include <list>
 #include <qstring.h>
 
 class Bazmek
@@ -9,7 +9,7 @@ class Bazmek
   public:
     Bazmek();
 
-    std::vector<Bazmek> b;
+    std::list<Bazmek> b;
     float hodnota;
 
     enum Druh{CIVKA, KONDENZATOR};
@@ -26,6 +26,7 @@ class Bazmek
     void odstran_prebytecne();
 
     void nahodne();
+    void mutace(float m);
 
     QString to_string();
 
