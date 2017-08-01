@@ -195,21 +195,30 @@ void MainWindow::on_pushButton_4_clicked()
   }
 
   Darwin2 d;
-  d.pridej_tvory(10);
-  d.ohodnot();
-  d.serad();
-  d.vypis_populaci();
-  for (d.generace = 1; d.generace <= 100; d.generace++) {
-    d.mutace();
-    d.krizeni();
-    d.rozmnozuj();
-    d.ohodnot();
-    d.serad();
-  }
-  d.vypis_populaci();
+  Darwin2::zpusob_vyberu = false;
+  d.vyres(10);
+  //d.vypis_populaci();
 
-  Darwin2::Bazmek& nej = d.populace[0];
+  Darwin2::Bazmek nej = d.populace[0];
+  nej.uzavri();
+  std::string clovek = nej.lidsky();
+  std::cout << "\n\n" << clovek << std::endl;
   //nej.odstran_zbytecne();
+
+  d.nastav_druhe_kolo();
+  Darwin2::zpusob_vyberu = true;
+  d.populace.clear();
+  d.vyres(10);
+  //d.vypis_populaci();
+
+  d.populace[0].uzavri();
+  clovek = d.populace[0].lidsky();
+  std::cout << clovek << std::endl;
+
+  nej.houby += d.populace[0].houby;
+  clovek = nej.lidsky();
+  std::cout << clovek << std::endl;
+
 
   for (int i = 0; i < int(Darwin2::zadani.size()); i++) {
     float Zlr2 = Darwin2::zadani[i].Zlr, Zli2 = Darwin2::zadani[i].Zli, f2 = Darwin2::zadani[i].f;
@@ -229,8 +238,7 @@ void MainWindow::on_pushButton_4_clicked()
     ui->t_vystup_2->setItem(i, 2, new QTableWidgetItem(str));
   }
   QString the_str;
-  std::string clovek = nej.lidsky();
+
   the_str.fromStdString(clovek);
   ui->t_prizpusobeni->setText(the_str);
-  std::cout << "\n\n" << clovek << std::endl;
 }

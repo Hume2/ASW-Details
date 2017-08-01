@@ -7,6 +7,7 @@
 #include <iostream>
 
 std::vector<Darwin2::Zadani> Darwin2::zadani;
+bool Darwin2::zpusob_vyberu = false;
 
 const float E12[12] = {1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2};
 const float rady[8] = {1E-12, 1E-11, 1E-10, 1E-9, 1E-8, 1E-7, 1E-6, 1E-5};
@@ -82,20 +83,59 @@ std::string Darwin2::Bazmek::lidsky() {
   return result;
 }
 
+void Darwin2::Bazmek::uzavri() {
+  bool co = true;
+  int hloubka = 0;
+  bool je_civka;
+  for (unsigned int i = 0; i < houby.size(); i++) {
+    if (co) {
+      if (houby[i] & 0b00100000) {
+        co = true;
+        hloubka++;
+      } else {
+        co = false;
+      }
+      je_civka = (houby[i] & 0b00010000) && !co;
+    } else {
+      co = true;
+      char hodnota = (houby[i] & 0b11110000)>>4;
+      char rad = houby[i] & 0b00000111;
+      if (hodnota >= 12 || (!je_civka && rad >= 5) || (je_civka && rad <= 2)) {
+        if (hloubka > 0) {
+          hloubka--;
+        }
+      }
+    }
+  }
+  if (!co) {
+    //std::cout << "!!!";
+    houby.pop_back();
+  }
+  while (hloubka > 0) {
+    hloubka--;
+    houby.push_back(0x00);
+    houby.push_back(0xFF);
+  }
+}
+
 void Darwin2::Bazmek::ohodnot() {
   swr = 1;
   for (std::vector<Zadani>::iterator it = zadani.begin(); it != zadani.end(); ++it) {
     float Zr = it->Zlr;
     float Zi = it->Zli;
     transformuj(Zr, Zi, it->f);
-    //float swr_ = spocitej_swr(Zr, Zi, 50);
-    float swr_ = -(Zr - 50)*(50/Zr - 1);
+    float swr_;
+    if (zpusob_vyberu) {
+      swr_ = /*-(Zr - 50)*(50/Zr - 1) * cosh(Zi);*/spocitej_swr(Zr, Zi, 50);
+    } else {
+      swr_ = -(Zr - 50)*(50/Zr - 1);
+    }
     if (swr_!=swr_ || swr_ >= 256) {
       swr_ = 256;
     }
-    swr *= swr_;
+    swr += swr_;
   }
-  hodnota = swr + houby.size()/10;
+  hodnota = swr + houby.size()/10*zadani.size();
 }
 
 float Darwin2::Bazmek::dej_cast(unsigned int &i, bool paralel, float f) {
@@ -134,7 +174,11 @@ float Darwin2::Bazmek::dej_cast(unsigned int &i, bool paralel, float f) {
 
     if (new_imp) {
       if (paralel) {
-        Zi = paralelne(Zi, imp);
+        if (Zi != Zi) {
+          Zi = imp;
+        } else {
+          Zi = paralelne(Zi, imp);
+        }
       } else {
         Zi = seriove(Zi, imp);
       }
@@ -153,9 +197,7 @@ void Darwin2::Bazmek::transformuj(float &Zr, float &Zi, float f) {
   unsigned int i = 0;
   while (i < houby.size()) {
     if (co) {
-      if (houby[i] & 0b00001000) {
-        napric = true;
-      }
+      napric = houby[i] & 0b00001000;
 
       if (houby[i] & 0b00100000) {
         i++;
@@ -308,5 +350,26 @@ float Darwin2::spocitej_swr(float Zlr, float Zli, float ref) {
     return nan("");
   } else {
     return (1 + G) / (1 - G);
+  }
+}
+
+void Darwin2::vyres(int zac) {
+  pridej_tvory(zac);
+  ohodnot();
+  serad();
+  //vypis_populaci();
+  for (generace = 1; generace <= 100; generace++) {
+    mutace();
+    krizeni();
+    rozmnozuj();
+    //pridej_tvory(zac);
+    ohodnot();
+    serad();
+  }
+}
+
+void Darwin2::nastav_druhe_kolo() {
+  for (auto& it : zadani) {
+    populace[0].transformuj(it.Zlr, it.Zli, it.f);
   }
 }

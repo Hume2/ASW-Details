@@ -24,6 +24,7 @@ class Darwin2
         void ohodnot();
         void transformuj(float& Zr, float& Zi, float f);
         float dej_cast(unsigned int& i, bool paralel, float f);
+        void uzavri();
     };
 
     class Zadani {
@@ -52,6 +53,8 @@ class Darwin2
     int max_vyber;
     int mutacni_index;
 
+    static bool zpusob_vyberu;
+
     void pridej_tvory(int pocet);
     void mutace();
     void krizeni();
@@ -60,6 +63,9 @@ class Darwin2
     void ohodnot();
 
     void vypis_populaci();
+
+    void vyres(int zac);
+    void nastav_druhe_kolo();
 
     static bool je_lepsi(const Bazmek& A, const Bazmek& B);
 
