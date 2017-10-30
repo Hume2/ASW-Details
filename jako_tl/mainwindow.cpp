@@ -216,6 +216,8 @@ void MainWindow::on_pushButton_4_clicked()
   std::cout << clovek << std::endl;
 
   nej.houby += d.populace[0].houby;
+  //unsigned int prdlolo = 0;
+  //nej.normalizuj(prdlolo);
   clovek = nej.lidsky();
   std::cout << clovek << std::endl;
 

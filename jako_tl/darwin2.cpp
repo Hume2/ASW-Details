@@ -118,6 +118,47 @@ void Darwin2::Bazmek::uzavri() {
   }
 }
 
+int Darwin2::Bazmek::normalizuj(unsigned int& i) {
+  bool co = true;
+  int casti = 0;
+  int zacatek = 0;
+  bool je_civka;
+  while (i < houby.size()) {
+    if (co) {
+      if (houby[i] & 0b00100000) {
+        co = true;
+        zacatek = i;
+        i++;
+        int c_sti = normalizuj(i);
+        if (c_sti == 0) {
+          houby.erase(zacatek, i - zacatek);
+          i = zacatek;
+        } else if (c_sti == 1) {
+          houby.erase(i - 2, 2);
+          houby.erase(zacatek);
+          i -= 3;
+        } else {
+          casti++;
+        }
+      } else {
+        co = false;
+      }
+      je_civka = (houby[i] & 0b00010000) && !co;
+    } else {
+      co = true;
+      char hodnota = (houby[i] & 0b11110000)>>4;
+      char rad = houby[i] & 0b00000111;
+      if (hodnota >= 12 || (!je_civka && rad >= 5) || (je_civka && rad <= 2)) {
+        return casti;
+        i++;
+      }
+      casti++;
+    }
+    i++;
+  }
+  return casti;
+}
+
 void Darwin2::Bazmek::ohodnot() {
   swr = 1;
   for (std::vector<Zadani>::iterator it = zadani.begin(); it != zadani.end(); ++it) {
@@ -130,10 +171,10 @@ void Darwin2::Bazmek::ohodnot() {
     } else {
       swr_ = -(Zr - 50)*(50/Zr - 1);
     }
-    if (swr_!=swr_ || swr_ >= 256) {
-      swr_ = 256;
+    if (swr_!=swr_ || swr_ >= 1000000) {
+      swr_ = 1000000;
     }
-    swr += swr_;
+    swr += log2(swr_);
   }
   hodnota = swr + houby.size()/10*zadani.size();
 }

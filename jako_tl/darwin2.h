@@ -14,6 +14,7 @@ class Darwin2
       public:
         std::string houby;
         float swr, hodnota;
+        int hotovo;
         Bazmek() :
           houby(),
           swr(-1),
@@ -25,6 +26,7 @@ class Darwin2
         void transformuj(float& Zr, float& Zi, float f);
         float dej_cast(unsigned int& i, bool paralel, float f);
         void uzavri();
+        int normalizuj(unsigned int& i);
     };
 
     class Zadani {
